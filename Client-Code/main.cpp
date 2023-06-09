@@ -19,7 +19,7 @@
 
 
 #define UPDATEINTERVAL_MS 20
-#define ENABLE_MULTITASKING 0 //set to 1 to enable multitasking else run in super-loop
+#define ENABLE_MULTITASKING 1 //set to 1 to enable multitasking else run in super-loop
 
 #define WIFI_SSID "Debug Network"
 #define WIFI_PASSWORT "1234567890"
@@ -116,26 +116,7 @@ void setup() {
 
 
 void loop() {
-  byte error, address;
-  int deviceCount = 0;
-
-  Serial.println("Scanning...");
-
-  for (address = 1; address < 127; ++address) {
-    Wire.beginTransmission(address);
-    error = Wire.endTransmission();
-
-    if (error == 0) {
-      Serial.print("Device found at address 0x");
-      if (address < 16) {
-        Serial.print("0");
-      }
-      Serial.print(address, HEX);
-      Serial.println();
-      deviceCount++;
-    }
-  }
-  if(ENABLE_MULTITASKING==2){//execute the following code in a super-loop
+  if(ENABLE_MULTITASKING==0){//execute the following code in a super-loop
     long start_time = millis();
     handle_position_data();
     handle_haptic_feedback();
