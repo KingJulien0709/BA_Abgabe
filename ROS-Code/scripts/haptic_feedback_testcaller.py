@@ -2,10 +2,12 @@
 import json
 import random
 import rospy
+import std_msgs.msg
 from std_msgs.msg import String
+from std_msgs.msg import UInt8
 from sensor_msgs.msg import Imu
 
-MSG_PER_SECOND = 50
+MSG_PER_SECOND = 10
 
 DRV_MSG_LEN = 63  # space for the zero byte at the end for the client
 
@@ -16,7 +18,7 @@ def callback_imu_data(msg):
 def create_lra_data_msg(arr):
     data_dict = {}
     for i in range(5):
-        data_dict.setdefault(str(i),arr[i])
+        data_dict.setdefault(i, arr[i])
     jsonstring = json.dumps(data_dict)
     msg_len = len(jsonstring)
     if msg_len < DRV_MSG_LEN:
@@ -26,17 +28,19 @@ def create_lra_data_msg(arr):
 
 def haptic_feedback_tester():
     pub = rospy.Publisher('/haptic_feedback/lra_motor_array', String, queue_size=MSG_PER_SECOND)
-    sub = rospy.Subscriber('/haptic_feedback/imu_data', Imu, callback_imu_data)
+    # sub = rospy.Subscriber('/haptic_feedback/imu_data', Imu, callback_imu_data)
     rospy.init_node('haptic_feedback_tester', anonymous=True)
     rate = rospy.Rate(MSG_PER_SECOND)  # 20hz
     while not rospy.is_shutdown():
         try:
-            msg = create_lra_data_msg([random.randint(0, 255) for _ in range(5)])
-            rospy.logdebug("Sending data: %s", msg)
+            msg = create_lra_data_msg([random.randint(128, 255) for _ in range(5)])
+            rospy.loginfo("Sending data is: %s", msg)
             pub.publish(msg)
             rate.sleep()
         except Exception as e:
             rospy.logerr(e)
+
+
 
 
 if __name__ == '__main__':

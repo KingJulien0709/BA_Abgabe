@@ -8,10 +8,12 @@ import json
 import socket
 
 ROS_MASTER_URI = "http://192.168.178.123:11311"
-IP_ADDRESS = "192.168.178.31"
+IP_ADDRESS = "192.168.43.226"
 PORT = 5000
-MSG_PER_SECOND = 50
+MSG_PER_SECOND = 10
 IMU_MSG_LEN = 128
+
+
 
 
 def create_imu_msg_from_json(msg):
@@ -57,7 +59,7 @@ class HapticFeedbackNode:
             if msg is None:
                 rospy.logerr("Could not create lra data message")
                 return
-            rospy.logdebug("Sending data: %s", msg)
+            rospy.loginfo("Sending data: %s", msg)
             send_msg = str(msg).encode("utf-8")
             self.socket_client.send(send_msg)
         except socket.error as socket_e:
@@ -76,17 +78,17 @@ class HapticFeedbackNode:
                 rospy.loginfo("Connected to %s", address)
                 self.active = True
                 while self.active:
-                    rospy.logdebug("Waiting for data")
-                    result = self.socket_client.recv(IMU_MSG_LEN)
-                    len_received = len(result)
-                    if len_received < IMU_MSG_LEN:
-                        result += self.socket_client.recv(IMU_MSG_LEN - len_received)
-                    rospy.logdebug("Received data: %s", result)
-                    imu_msg = create_imu_msg_from_json(result)
-                    if imu_msg is None:
-                        rospy.logerr("Could not create imu message")
-                        continue
-                    self.pub.publish(imu_msg)  # publish the imu message to the imu topic
+                    #rospy.logdebug("Waiting for data")
+                    #result = self.socket_client.recv(IMU_MSG_LEN)
+                    #len_received = len(result)
+                    #if len_received < IMU_MSG_LEN:
+                    #    result += self.socket_client.recv(IMU_MSG_LEN - len_received)
+                    #rospy.logdebug("Received data: %s", result)
+                    #imu_msg = create_imu_msg_from_json(result)
+                    #if imu_msg is None:
+                    #    rospy.logerr("Could not create imu message")
+                    #    continue
+                    #self.pub.publish(imu_msg)  # publish the imu message to the imu topic
                     self.rate.sleep()  # the sleep rate is set to 100Hz, which is the maximum rate of the imu sensor
                 self.socket_client.close()  # will be executed if the while loop is exited due to an error
                 self.socket_client = None  # will free up the socket for a new connection
